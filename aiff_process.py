@@ -9,11 +9,9 @@
 #########################################################################
 
 import glob
-import numpy as np
-import matplotlib.pyplot as plt
+import spectrogram
+import mpr
 import soundfile as sf
-from skimage.measure import block_reduce
-from numba import jit
 
 
 class aiff(object):
@@ -25,11 +23,11 @@ class aiff(object):
         :path: TODO
 
         Members
-        :_aiff_dates: List of numpy array
+        :_aiff_datas: List of numpy array
 
         """
         self._max_layers = 6
-        self._temporol_point = 8
+        self._temporal_point = 8
 
         aiff_files = glob.glob(path + '/**/*.aif', recursive=True)
         aiff_datas = []
@@ -47,123 +45,34 @@ class aiff(object):
             assert sample_rate == std_samplerate, \
                 "Sample rate is not {} Hz".format(std_samplerate)
 
-        self._aiff_dates = aiff_datas
+        self._aiff_datas = aiff_datas
         self._samplerate = std_samplerate
-        self.mpr_generate()
+        self._temporal_point = 8
 
-    def mpr_generate(self) -> None:
-        """Some visualing test
-
-        ::
-
-        """
+        # Calculate temporal point
         temporal_data_point_list = []
 
-        for datas in self._aiff_dates:
+        for datas in self._aiff_datas:
             samples = datas.shape[0]
 
             # The aiff file is long enough
             assert samples > self.samples_calc(1)
 
-            last_temporol_data_point = samples - self.samples_calc(1) - 1
+            last_temporal_data_point = samples - self.samples_calc(1) - 1
 
             temporal_data_point = [
-                int(last_temporol_data_point / 2**(8 - i))
+                int(last_temporal_data_point / 2**(8 - i))
                 for i in range(1, 8)
             ]
             temporal_data_point = [0] + temporal_data_point
             temporal_data_point_list.append(temporal_data_point)
             # print(temporal_data_point)
 
-        # Now Start MPR plot generated
-        # mpr_plot = audio_indexs * ndarray(8 * 6 * 32 * 32 * 2)
-        mpr_image = []
+        self._temporal_data_point_list = temporal_data_point_list
 
-        for audio_index in range(len(self._aiff_dates)):
-            # self._aiff_dates[audio_index] is the current audio_file
-            # temporal_data_point_list[audio_index] is
-            #   the current temporol point
-            mpr_matrices = []
-
-            for temporal_index in temporal_data_point_list[audio_index]:
-                mpr_layers = []
-                for layer_index in range(1, self._max_layers + 1):
-
-                    # Now Start 1d max pooling process
-                    n_signal = self.n_calc(layer_index) - 5
-
-                    max_pooling_1d_size = 2**(max(n_signal - 3, 0))
-
-                    # ******************* Debug Log
-                    # print(temporal_index)
-                    # print(temporal_index + self.samples_calc(layer_index))
-                    # print(self._aiff_dates)
-
-                    signal_1d_after_max_pooling =  \
-                        block_reduce(
-                            self._aiff_dates[audio_index][temporal_index:temporal_index +
-                                                          self.samples_calc(layer_index)],
-                            (max_pooling_1d_size, 1), np.max)
-
-                    # 2d RP generation
-                    origin_2d_rp_two_track = self.rp_2d_calc(
-                        signal_1d_after_max_pooling)
-
-                    # 2d RP max pooling
-                    after_max_pooling_2d_size = 2**(min(n_signal, 3))
-
-                    # ******************* Debug Log
-                    # print("after_max_pooling_2d_size")
-                    print(self._aiff_dates[audio_index]
-                          [temporal_index:temporal_index +
-                           self.samples_calc(layer_index)].shape)
-                    print(signal_1d_after_max_pooling.shape,
-                          "signal_1d_after_max_pooling.shape")
-                    print(after_max_pooling_2d_size,
-                          "after_max_pooling_2d_size")
-                    print(origin_2d_rp_two_track.shape,
-                          "origin_2d_rp_two_track.shape")
-
-                    signal_2d_after_max_pooling =  \
-                        block_reduce(
-                            origin_2d_rp_two_track,
-                            (after_max_pooling_2d_size,
-                             after_max_pooling_2d_size,
-                             1), np.max)
-
-                    # zero centering of RP image
-                    final_rp = self.rp_centering(signal_2d_after_max_pooling)
-
-                    # Debug log
-                    # print(final_rp.shape)
-
-                    mpr_layers.append(final_rp)
-
-                mpr_matrices.append(np.array(mpr_layers))
-
-            mpr_image.append(np.array(mpr_matrices))
-
-            # Now plot for a test
-
-            # if audio_index == 0:
-            #     plt.gray()
-            #     for points in range(self._temporol_point):
-            #         for layers in range(self._max_layers):
-            #             plt.subplot(self._temporol_point, self._max_layers,
-            #                         points * self._max_layers + (layers + 1))
-            #             plt.plot(
-            #                 mpr_image[audio_index][points, layers, :, :, 0])
-            #     plt.savefig('RP1.png')
-            #     plt.close()
-
-            if audio_index == 0:
-                plt.imshow(
-                    mpr_image[0][0, 0, :, :, 0], cmap=plt.get_cmap('gray'))
-                print(mpr_image[0][0, 0, :, :, 0])
-                plt.show()
-
-        mpr_numpy_image = np.array(mpr_image)
-        np.save('mpr_image.npz', mpr_numpy_image)
+        mpr_obj = mpr.mpr(self._aiff_datas, self._temporal_data_point_list,
+                          self._temporal_point, self._max_layers)
+        mpr_obj.mpr_generate()
 
     def samples_calc(self, layer: int) -> int:
         """Calculate the layer samples
@@ -173,51 +82,6 @@ class aiff(object):
 
         """
         return 2**(5 + 2 * (self._max_layers - layer))
-
-    def n_calc(self, layer: int) -> int:
-        """Calculate the log_2(layer samples)
-
-        :layer: TODO
-        :returns: TODO
-
-        """
-
-        return 5 + 2 * (self._max_layers - layer)
-
-    @jit
-    def rp_2d_calc(self,
-                   signal_1d_after_max_pooling: np.ndarray) -> np.ndarray:
-        """Generate 2d RP from 1d after max pooling
-
-        :signal_1d_after_max_pooling: np.ndarray: TODO
-        :returns: TODO
-
-        """
-        sample_len, track = signal_1d_after_max_pooling.shape
-        rp_2d_two_track = np.empty((sample_len, sample_len, track))
-        for i in range(sample_len):
-            for j in range(sample_len):
-                for k in range(track):
-                    rp_2d_two_track[i, j, k] = \
-                        signal_1d_after_max_pooling[i][k] - \
-                        signal_1d_after_max_pooling[j][k]
-        return rp_2d_two_track
-
-    @jit
-    def rp_centering(self,
-                     signal_2d_after_max_pooling: np.ndarray) -> np.ndarray:
-        """To do zero centering process
-
-        :signal_2d_after_max_pooling: np.ndarray: TODO
-        :returns: TODO
-
-        """
-        square_2d_signal = np.sqrt(signal_2d_after_max_pooling)
-
-        # Debug log
-        # print(square_2d_signal.shape)
-
-        return square_2d_signal - np.mean(square_2d_signal, (0, 1))
 
 
 if __name__ == "__main__":

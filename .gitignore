@@ -2,3 +2,4 @@
 resource
 __pycache__
 *.png 
+*.npy
