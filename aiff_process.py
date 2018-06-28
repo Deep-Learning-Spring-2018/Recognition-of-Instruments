@@ -9,12 +9,11 @@
 #########################################################################
 
 import glob
-
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 import soundfile as sf
-from numba import jit
 from skimage.measure import block_reduce
+from numba import jit
 
 
 class aiff(object):
