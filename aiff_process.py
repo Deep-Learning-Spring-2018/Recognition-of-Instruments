@@ -90,9 +90,9 @@ class aiff(object):
                 for layer_index in range(1, self._max_layers + 1):
 
                     # Now Start 1d max pooling process
-                    after_max_pooling_1d_size = \
-                        2**(self.n_calc(layer_index) -
-                            max(layer_index - 5 - 3, 0))
+                    n_signal = self.n_calc(layer_index) - 5
+
+                    max_pooling_1d_size = 2**(max(n_signal - 3, 0))
 
                     # ******************* Debug Log
                     # print(temporal_index)
@@ -101,27 +101,35 @@ class aiff(object):
 
                     signal_1d_after_max_pooling =  \
                         block_reduce(
-                            self._aiff_dates[audio_index][temporal_index:temporal_index + \
-                                        self.samples_calc(layer_index)],
-                            (after_max_pooling_1d_size, 2), np.max)
+                            self._aiff_dates[audio_index][temporal_index:temporal_index +
+                                                          self.samples_calc(layer_index)],
+                            (max_pooling_1d_size, 1), np.max)
 
                     # 2d RP generation
                     origin_2d_rp_two_track = self.rp_2d_calc(
                         signal_1d_after_max_pooling)
+
                     # 2d RP max pooling
-                    after_max_pooling_2d_size = after_max_pooling_1d_size // 2**(
-                        min(self.n_calc(layer_index), 3))
+                    after_max_pooling_2d_size = 2**(min(n_signal, 3))
 
                     # ******************* Debug Log
                     # print("after_max_pooling_2d_size")
-                    print(after_max_pooling_2d_size)
+                    print(self._aiff_dates[audio_index]
+                          [temporal_index:temporal_index +
+                           self.samples_calc(layer_index)].shape)
+                    print(signal_1d_after_max_pooling.shape,
+                          "signal_1d_after_max_pooling.shape")
+                    print(after_max_pooling_2d_size,
+                          "after_max_pooling_2d_size")
+                    print(origin_2d_rp_two_track.shape,
+                          "origin_2d_rp_two_track.shape")
 
                     signal_2d_after_max_pooling =  \
                         block_reduce(
                             origin_2d_rp_two_track,
                             (after_max_pooling_2d_size,
                              after_max_pooling_2d_size,
-                             2), np.max)
+                             1), np.max)
 
                     # zero centering of RP image
                     final_rp = self.rp_centering(signal_2d_after_max_pooling)
@@ -149,9 +157,10 @@ class aiff(object):
             #     plt.close()
 
             if audio_index == 0:
-                plt.imshow(mpr_image[0][0, 0, :, :, 0], cmap=plt.get_cmap('gray'))
+                plt.imshow(
+                    mpr_image[0][0, 0, :, :, 0], cmap=plt.get_cmap('gray'))
                 print(mpr_image[0][0, 0, :, :, 0])
-                pkt.show()
+                plt.show()
 
         mpr_numpy_image = np.array(mpr_image)
         np.save('mpr_image.npz', mpr_numpy_image)
@@ -212,7 +221,7 @@ class aiff(object):
 
 
 if __name__ == "__main__":
-    VIOLIN_PATH = "./resourse/violin"
+    VIOLIN_PATH = "./resource/violin"
     my_obj = aiff(VIOLIN_PATH)
     # data, samplerate = sf.read(
     #     "./resourse/violin/Violin.arco.ff.sulA.stereo/Violin.arco.ff.sulA.E5.stereo.aif"
