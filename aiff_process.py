@@ -9,11 +9,12 @@
 #########################################################################
 
 import glob
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 import soundfile as sf
-from skimage.measure import block_reduce
 from numba import jit
+from skimage.measure import block_reduce
 
 
 class aiff(object):
@@ -151,7 +152,7 @@ class aiff(object):
             if audio_index == 0:
                 plt.imshow(mpr_image[0][0, 0, :, :, 0], cmap=plt.get_cmap('gray'))
                 print(mpr_image[0][0, 0, :, :, 0])
-                pkt.show()
+                plt.show()
 
         mpr_numpy_image = np.array(mpr_image)
         np.save('mpr_image.npz', mpr_numpy_image)
