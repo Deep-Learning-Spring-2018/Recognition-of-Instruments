@@ -123,7 +123,7 @@ class mpr(object):
         # Now plot for a test
 
         plt.gray()
-        plt.figure(figsize=(16, 12))
+        plt.figure(figsize=(12, 16))
         for points in range(self._temporal_point):
             for layers in range(self._max_layers):
                 plt.subplot(self._temporal_point, self._max_layers,
@@ -131,7 +131,7 @@ class mpr(object):
                 plt.imshow(mpr_image[audio_index][points, layers, :, :, 0])
                 plt.axis('off')
                 plt.tight_layout()
-                plt.subplots_adjust(wspace=0, hspace=0.5)
+                plt.subplots_adjust(wspace=0.4, hspace=0.4)
         plt.savefig('RP1.png')
         plt.close()
 

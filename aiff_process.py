@@ -70,9 +70,23 @@ class aiff(object):
 
         self._temporal_data_point_list = temporal_data_point_list
 
+
+    def mpr_process(self) -> None:
+        """
+        :returns: None
+
+        """
         mpr_obj = mpr.mpr(self._aiff_datas, self._temporal_data_point_list,
                           self._temporal_point, self._max_layers)
         mpr_obj.mpr_generate()
+
+    def spectrogram_process(self) -> None:
+        """Processing spectrogram
+        :returns: TODO
+
+        """
+        spectrogram_obj = spectrogram.spectrogram(self._aiff_datas, self._temporal_data_point_list, self._temporal_point)
+        spectrogram_obj.spectrogram_generate()
 
     def samples_calc(self, layer: int) -> int:
         """Calculate the layer samples
@@ -87,6 +101,8 @@ class aiff(object):
 if __name__ == "__main__":
     VIOLIN_PATH = "./resource/violin"
     my_obj = aiff(VIOLIN_PATH)
+    my_obj.spectrogram_process()
+    my_obj.mpr_process()
     # data, samplerate = sf.read(
     #     "./resourse/violin/Violin.arco.ff.sulA.stereo/Violin.arco.ff.sulA.E5.stereo.aif"
     # )
