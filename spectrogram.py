@@ -101,8 +101,10 @@ def spectrogram_single(data,
                 nperseg=window_length,
                 nfft=resolution * 2,
                 noverlap=int(window_length * (1 - hop)),
-                return_onesided=True,
-                mode='magnitude')
+                return_onesided=True)
+            for x in range(resolution):
+                for y in range(spectrogram_length):
+                    sxx[x, y] = np.log(sxx[x, y])
             channel_ret.append(
                 np.resize(sxx, [resolution, spectrogram_length]))
         ret.append(channel_ret)
