@@ -1,10 +1,9 @@
 from unittest import TestCase, main
 
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal
 import soundfile as sf
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 from scipy.signal import get_window
 
 
@@ -96,7 +95,7 @@ def spectrogram_single(data,
             f, t, sxx = scipy.signal.spectrogram(
                 x=data[acquisition_points[j]:acquisition_points[j] +
                        int(window_length *
-                           (1 + (hop * len(acquisition_points) - 1))), i],
+                           (1 + hop * (spectrogram_length - 1))), i],
                 fs=sample_rate,
                 window=get_window(('tukey', .25), 64),
                 nperseg=window_length,
@@ -110,19 +109,19 @@ def spectrogram_single(data,
     return np.transpose(ret, [1, 2, 3, 0])
 
 
-# class SpectrogramTestCase(TestCase):
-#     def test_generate_spectrogram_shape(self):
-#         with open('/home/bill/Documents/curriculum/深度学习/code/test.aif', 'rb') as f:
-#             data, rate = sf.read(f)
-#         spectrum = generate_spectrogram(
-#             data=data,
-#             sample_rate=rate,
-#             acquisition_points=[128, 256, 512, 1024, 2048, 4096],
-#             hop=0.25,
-#             resolution=32,
-#             spectrogram_length=32
-#         )
-#         self.assertEqual(spectrum.shape, (6, 32, 32, 2))
+class SpectrogramTestCase(TestCase):
+    def test_generate_spectrogram_shape(self):
+        with open('/home/bill/Documents/curriculum/深度学习/code/test.aif', 'rb') as f:
+            data, rate = sf.read(f)
+        spectrum = spectrogram_single(
+            data=data,
+            sample_rate=rate,
+            acquisition_points=[128, 256, 512, 1024, 2048, 4096],
+            hop=0.25,
+            resolution=32,
+            spectrogram_length=32
+        )
+        self.assertEqual(spectrum.shape, (6, 32, 32, 2))
 
 if __name__ == '__main__':
     main()

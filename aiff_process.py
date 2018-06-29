@@ -9,9 +9,11 @@
 #########################################################################
 
 import glob
-import spectrogram
-import mpr
+
 import soundfile as sf
+
+import mpr
+import spectrogram
 
 
 class aiff(object):
@@ -102,7 +104,7 @@ if __name__ == "__main__":
     VIOLIN_PATH = "./resource/violin"
     my_obj = aiff(VIOLIN_PATH)
     my_obj.spectrogram_process()
-    my_obj.mpr_process()
+    # my_obj.mpr_process()
     # data, samplerate = sf.read(
     #     "./resourse/violin/Violin.arco.ff.sulA.stereo/Violin.arco.ff.sulA.E5.stereo.aif"
     # )
