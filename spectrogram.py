@@ -50,7 +50,7 @@ class spectrogram(object):
         plt.figure(figsize=(4, 12))
         for points in range(self._temporal_point):
             plt.subplot(self._temporal_point, 1, points + 1)
-            im = plt.imshow(spectrogram_image[audio_index][points, :, :, 0])
+            im = plt.imshow(spectrogram_image[audio_index][points, :, :, 0], cmap=plt.get_cmap('jet'))
             plt.axis('off')
             plt.colorbar(im)
             plt.tight_layout()
