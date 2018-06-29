@@ -3,3 +3,8 @@ resource
 __pycache__
 *.png 
 *.npy
+*.aif
+.idea
+.gitignore.swp
+_trial_temp
+.ipynb_checkpoints
