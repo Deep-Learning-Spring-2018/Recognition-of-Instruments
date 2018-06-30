@@ -64,9 +64,9 @@ class aiff(object):
 
             temporal_data_point = [
                 int(last_temporal_data_point / 2**(8 - i))
-                for i in range(1, 8)
+                for i in range(8)
             ]
-            temporal_data_point = [0] + temporal_data_point
+            temporal_data_point = temporal_data_point
             temporal_data_point_list.append(temporal_data_point)
             # print(temporal_data_point)
 
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     VIOLIN_PATH = "./resource/violin"
     my_obj = aiff(VIOLIN_PATH)
     my_obj.spectrogram_process()
-    # my_obj.mpr_process()
+    my_obj.mpr_process()
     # data, samplerate = sf.read(
     #     "./resourse/violin/Violin.arco.ff.sulA.stereo/Violin.arco.ff.sulA.E5.stereo.aif"
     # )

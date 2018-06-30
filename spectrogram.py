@@ -5,6 +5,7 @@ import numpy as np
 import scipy.signal
 import soundfile as sf
 from scipy.signal import get_window
+from skimage.measure import block_reduce
 
 
 class spectrogram(object):
@@ -31,14 +32,14 @@ class spectrogram(object):
 
         for audio_index in range(len(self._aiff_datas)):
             spectrogram_image.append(
-                spectrogram_single(
-                    self._aiff_datas[audio_index],
-                    self._temporal_data_point_list[audio_index]))
+                spectrogram_single(self._aiff_datas[audio_index],
+                                   self._temporal_data_point_list[audio_index],
+                                   audio_index))
 
-        self.spectrogram_plot(spectrogram_image)
         self.spectrogram_image_save(spectrogram_image)
+        self.spectrogram_plot(spectrogram_image)
 
-    def spectrogram_plot(self, spectrogram_image, audio_index=0) -> None:
+    def spectrogram_plot(self, spectrogram_image, audio_index=5) -> None:
         """Plot spectrogram image for showing
 
         :spectrogram_image: TODO
@@ -71,10 +72,11 @@ class spectrogram(object):
 
 def spectrogram_single(data,
                        acquisition_points,
+                       audio_index,
                        sample_rate=44100,
                        hop=0.25,
-                       resolution=32,
-                       spectrogram_length=32,
+                       resolution=256,
+                       spectrogram_length=256,
                        channel_num=2):
     """
 
@@ -94,26 +96,43 @@ def spectrogram_single(data,
             window_length = resolution * 2
             f, t, sxx = scipy.signal.spectrogram(
                 x=data[acquisition_points[j]:acquisition_points[j] +
-                       int(window_length *
-                           (1 + hop * (spectrogram_length - 1))), i],
+                       int(window_length * (1 + hop *
+                                            (spectrogram_length - 1))), i],
                 fs=sample_rate,
-                window=get_window(('tukey', .25), 64),
+                window=get_window(('tukey', hop), resolution * 2),
                 nperseg=window_length,
                 nfft=resolution * 2,
                 noverlap=int(window_length * (1 - hop)),
                 return_onesided=True)
-            for x in range(resolution):
-                for y in range(spectrogram_length):
-                    sxx[x, y] = np.log(sxx[x, y])
+
+            # window_length = resolution * 2
+            # f, t, sxx = scipy.signal.spectrogram(
+            #     x=data[acquisition_points[j]:acquisition_points[j] +
+            #            int(window_length * (1 + hop *
+            #                                 (spectrogram_length - 1))), i],
+            #     fs=sample_rate,
+            #     return_onesided=True)
+            sxx = np.log(sxx)
+            sxx = (sxx - np.mean(sxx)) / np.std(sxx)
             channel_ret.append(
                 np.resize(sxx, [resolution, spectrogram_length]))
         ret.append(channel_ret)
-    return np.transpose(ret, [1, 2, 3, 0])
+
+    ret = np.transpose(ret, [1, 2, 3, 0])
+
+    # Average pooling process
+
+    average_pooling_size = ret.shape[1] // 32
+    ret = block_reduce(ret, (1, average_pooling_size, average_pooling_size, 1), np.average)
+    print(ret.shape)
+
+    return ret
 
 
 class SpectrogramTestCase(TestCase):
     def test_generate_spectrogram_shape(self):
-        with open('/home/bill/Documents/curriculum/深度学习/code/test.aif', 'rb') as f:
+        with open('/home/bill/Documents/curriculum/深度学习/code/test.aif',
+                  'rb') as f:
             data, rate = sf.read(f)
         spectrum = spectrogram_single(
             data=data,
@@ -121,9 +140,9 @@ class SpectrogramTestCase(TestCase):
             acquisition_points=[128, 256, 512, 1024, 2048, 4096],
             hop=0.25,
             resolution=32,
-            spectrogram_length=32
-        )
+            spectrogram_length=32)
         self.assertEqual(spectrum.shape, (6, 32, 32, 2))
+
 
 if __name__ == '__main__':
     main()

@@ -113,7 +113,7 @@ class mpr(object):
         self.mpr_plot(mpr_image)
         self.mpr_image_save(mpr_image)
 
-    def mpr_plot(self, mpr_image, audio_index=0) -> None:
+    def mpr_plot(self, mpr_image, audio_index=5) -> None:
         """Plot mpr image for showing
 
         :mpr_image: TODO
@@ -174,10 +174,16 @@ class mpr(object):
         """
         square_2d_signal = np.sqrt(signal_2d_after_max_pooling)
 
+        square_2d_signal = square_2d_signal - np.mean(square_2d_signal, (0, 1))
+
         # Debug log
         # print(square_2d_signal.shape)
 
-        return square_2d_signal - np.mean(square_2d_signal, (0, 1))
+        # normalization
+        epsilon = 0.001
+        square_2d_signal = square_2d_signal / (np.std(square_2d_signal, (0, 1)) + epsilon)
+
+        return square_2d_signal
 
 
 @jit(nopython=True, parallel=True)

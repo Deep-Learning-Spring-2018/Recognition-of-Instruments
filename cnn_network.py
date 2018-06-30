@@ -18,33 +18,103 @@ tf.logging.set_verbosity(tf.logging.DEBUG)
 tl.logging.set_verbosity(tl.logging.DEBUG)
 
 
-def main_test_cnn_layer():
+def load_mpr_dataset():
+    """load the multilayer Recurrent Plot dataset
+    :returns: TODO
+
+    """
+
+    return X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1
+
+
+def load_spectrogram_dataset():
+    """load the spectrogram datasets
+    :returns: TODO
+
+    """
+
+    return X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2
+
+
+def load_datasets(image_type_1: str, image_type_2: str):
+    """load the whole dataset to process multicolumn CNN
+    :returns: TODO
+
+    """
+    if image_type_1 == 'mpr':
+        X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1 = \
+            load_mpr_dataset()
+    elif image_type_1 == 'spectrogram':
+        X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1 = \
+            load_spectrogram_dataset()
+    else:
+        print("Not a valid image type")
+
+    if image_type_2 == 'mpr':
+        X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = \
+            load_mpr_dataset()
+    elif image_type_2 == 'spectrogram':
+        X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = \
+            load_spectrogram_dataset()
+    else:
+        print("Not a valid image type")
+
+    return X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1, \
+        X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2
+
+
+def MCNN_mpr_mpr():
+    """
+    :returns: TODO
+
+    """
+    main_test_cnn_layer_mpr_spectrogram(load_datasets('mpr', 'mpr'))
+
+
+def MCNN_spectrogram_spectrogram():
+    """
+    :returns: TODO
+
+    """
+    main_test_cnn_layer_mpr_spectrogram(load_datasets('spectrogram', 'spectrogram'))
+
+
+def MCNN_mpr_spectrogram():
+    """
+    :returns: TODO
+
+    """
+    main_test_cnn_layer_mpr_spectrogram(load_datasets('mpr', 'spectrogram'))
+
+
+def main_test_cnn_layer_mpr_spectrogram(
+        X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1, X_train_2,
+        y_train_2, X_val_2, y_val_2, X_test_2, y_test_2):
 
     # **********************************************************
     # TODO
     # This Place is to Prepared data
-    # :X_train_mpr: ? * 32 * 32 * 2 ndarray(float)
-    # :X_train_spectrogram: ? * 32 * 32 * 2 ndarray(float)
-    # :X_train_mpr: ? * 2 ndarray(int64)
-    # :X_train_spectrogram: ? * 2 ndarray(int64)
+    # :X_train_1: ? * 32 * 32 * 2 ndarray(float)
+    # :X_train_2: ? * 32 * 32 * 2 ndarray(float)
+    # :X_train_1: ? * 2 ndarray(int64)
+    # :X_train_2: ? * 2 ndarray(int64)
 
+    # :X_val_1: ? * 32 * 32 * 2 ndarray(float)
+    # :X_val_2: ? * 32 * 32 * 2 ndarray(float)
+    # :X_val_1: ? * 2 ndarray(int64)
+    # :X_val_2: ? * 2 ndarray(int64)
 
-    # :X_val_mpr: ? * 32 * 32 * 2 ndarray(float)
-    # :X_val_spectrogram: ? * 32 * 32 * 2 ndarray(float)
-    # :X_val_mpr: ? * 2 ndarray(int64)
-    # :X_val_spectrogram: ? * 2 ndarray(int64)
-
-    # :X_test_mpr: ? * 32 * 32 * 2 ndarray(float)
-    # :X_test_spectrogram: ? * 32 * 32 * 2 ndarray(float)
-    # :X_test_mpr: ? * 2 ndarray(int64)
-    # :X_test_spectrogram: ? * 2 ndarray(int64)
+    # :X_test_1: ? * 32 * 32 * 2 ndarray(float)
+    # :X_test_2: ? * 32 * 32 * 2 ndarray(float)
+    # :X_test_1: ? * 2 ndarray(int64)
+    # :X_test_2: ? * 2 ndarray(int64)
 
     # ATTENTION: X_train can be mpr data or spectrogram data, but should prepared sperately.
     # btw, I have no idea how to prepared data sperated for two net, multicolumn CNN is NOT implemented yet
 
     # This is official mnist data
-    X_train, y_train, X_val, y_val, X_test, y_test = tl.files.load_mnist_dataset(
-        shape=(-1, 28, 28, 1))
+    # X_train, y_train, X_val, y_val, X_test, y_test = tl.files.load_mnist_dataset(
+    #     shape=(-1, 28, 28, 1))
     # **********************************************************
 
     sess = tf.InteractiveSession()
@@ -54,19 +124,17 @@ def main_test_cnn_layer():
     # – especially for convolutional layers.
     batch_size = 16
 
-    x_mpr = tf.placeholder(
+    x_1 = tf.placeholder(
         tf.float32, shape=[batch_size, 32, 32,
                            2])  # [batch_size, height, width, channels]
 
-
-    x_spectrogram = tf.placeholder(
+    x_2 = tf.placeholder(
         tf.float32, shape=[batch_size, 32, 32,
                            2])  # [batch_size, height, width, channels]
     y_ = tf.placeholder(tf.int64, shape=[batch_size])
 
-    net_mpr = tl.layers.InputLayer(x_mpr, name='input_mpr')
-    net_spectrogram = tl.layers.InputLayer(
-        x_spectrogram, name='input_spectrogram')
+    net_1 = tl.layers.InputLayer(x_1, name='input_1')
+    net_2 = tl.layers.InputLayer(x_2, name='input_2')
     # Professional conv API for tensorflow expert
     # net = tl.layers.Conv2dLayer(net,
     #                     act = tf.nn.relu,
@@ -95,52 +163,47 @@ def main_test_cnn_layer():
     # Simplified conv API (the same with the above layers)
 
     # For MPR image network
-    net_mpr = tl.layers.Conv2d(
-        net_mpr,
+    net_1 = tl.layers.Conv2d(
+        net_1,
         32, (5, 5), (1, 1),
         act=tf.nn.relu,
         padding='SAME',
-        name='cnn1_mpr')
-    net_mpr = tl.layers.MaxPool2d(
-        net_mpr, (2, 2), (2, 2), padding='SAME', name='pool1_mpr')
-    net_mpr = tl.layers.Conv2d(
-        net_mpr,
+        name='cnn1_1')
+    net_1 = tl.layers.MaxPool2d(
+        net_1, (2, 2), (2, 2), padding='SAME', name='pool1_1')
+    net_1 = tl.layers.Conv2d(
+        net_1,
         32, (5, 5), (1, 1),
         act=tf.nn.relu,
         padding='SAME',
-        name='cnn2_mpr')
-    net_mpr = tl.layers.MaxPool2d(
-        net_mpr, (2, 2), (2, 2), padding='SAME', name='pool2_mpr')
-    net_mpr = tl.layers.FlattenLayer(net_mpr, name='flatten_mpr')
+        name='cnn2_1')
+    net_1 = tl.layers.MaxPool2d(
+        net_1, (2, 2), (2, 2), padding='SAME', name='pool2_1')
+    net_1 = tl.layers.FlattenLayer(net_1, name='flatten_1')
 
     # For spectrogram image network
-    net_spectrogram = tl.layers.Conv2d(
-        net_spectrogram,
+    net_2 = tl.layers.Conv2d(
+        net_2,
         32, (5, 5), (1, 1),
         act=tf.nn.relu,
         padding='SAME',
-        name='cnn1_spectrogram')
-    net_spectrogram = tl.layers.MaxPool2d(
-        net_spectrogram, (2, 2), (2, 2),
-        padding='SAME',
-        name='pool1_spectrogram')
-    net_spectrogram = tl.layers.Conv2d(
-        net_spectrogram,
+        name='cnn1_2')
+    net_2 = tl.layers.MaxPool2d(
+        net_2, (2, 2), (2, 2), padding='SAME', name='pool1_2')
+    net_2 = tl.layers.Conv2d(
+        net_2,
         32, (5, 5), (1, 1),
         act=tf.nn.relu,
         padding='SAME',
-        name='cnn2_spectrogram')
-    net_spectrogram = tl.layers.MaxPool2d(
-        net_spectrogram, (2, 2), (2, 2),
-        padding='SAME',
-        name='pool2_spectrogram')
-    net_spectrogram = tl.layers.FlattenLayer(
-        net_spectrogram, name='flatten_spectrogram')
+        name='cnn2_2')
+    net_2 = tl.layers.MaxPool2d(
+        net_2, (2, 2), (2, 2), padding='SAME', name='pool2_2')
+    net_2 = tl.layers.FlattenLayer(net_2, name='flatten_2')
 
     # end of conv
 
-    net = tl.layers.ConcatLayer(
-        [net_mpr, net_spectrogram], name='concat_layer')
+    net = tl.layers.ElementwiseLayer(
+        [net_1, net_2], combine_fn=tf.add, name='concat_layer')
     net = tl.layers.DropoutLayer(net, keep=0.5, name='drop1')
     net = tl.layers.DenseLayer(net, 256, act=tf.nn.relu, name='relu1')
     net = tl.layers.DropoutLayer(net, keep=0.5, name='drop2')
@@ -169,24 +232,110 @@ def main_test_cnn_layer():
     print('   learning_rate: %f' % learning_rate)
     print('   batch_size: %d' % batch_size)
 
+    # Training parameter for one input
+
+    # for epoch in range(n_epoch):
+    #     start_time = time.time()
+    #     for X_train_a, y_train_a in tl.iterate.minibatches(
+    #             X_train, y_train, batch_size, shuffle=True):
+    #         feed_dict = {x: X_train_a, y_: y_train_a}
+    #         feed_dict.update(net.all_drop)  # enable noise layers
+    #         sess.run(train_op, feed_dict=feed_dict)
+
+    #     # Show train information every print_freq
+    #     if epoch + 1 == 1 or (epoch + 1) % print_freq == 0:
+    #         print("Epoch %d of %d took %fs" % (epoch + 1, n_epoch,
+    #                                            time.time() - start_time))
+    #         train_loss, train_acc, n_batch = 0, 0, 0
+    #         for X_train_a, y_train_a in tl.iterate.minibatches(
+    #                 X_train, y_train, batch_size, shuffle=True):
+    #             dp_dict = tl.utils.dict_to_one(
+    #                 net.all_drop)  # disable noise layers
+    #             feed_dict = {x: X_train_a, y_: y_train_a}
+    #             feed_dict.update(dp_dict)
+    #             err, ac = sess.run([cost, acc], feed_dict=feed_dict)
+    #             train_loss += err
+    #             train_acc += ac
+    #             n_batch += 1
+    #         print("   train loss: %f" % (train_loss / n_batch))
+    #         print("   train acc: %f" % (train_acc / n_batch))
+    #         val_loss, val_acc, n_batch = 0, 0, 0
+    #         for X_val_a, y_val_a in tl.iterate.minibatches(
+    #                 X_val, y_val, batch_size, shuffle=True):
+    #             dp_dict = tl.utils.dict_to_one(
+    #                 net.all_drop)  # disable noise layers
+    #             feed_dict = {x: X_val_a, y_: y_val_a}
+    #             feed_dict.update(dp_dict)
+    #             err, ac = sess.run([cost, acc], feed_dict=feed_dict)
+    #             val_loss += err
+    #             val_acc += ac
+    #             n_batch += 1
+    #         print("   val loss: %f" % (val_loss / n_batch))
+    #         print("   val acc: %f" % (val_acc / n_batch))
+    #         # try:
+    #         #     tl.vis.CNN2d(net.all_params[0].eval(), second=10, saveable=True, name='cnn1_' + str(epoch + 1), fig_idx=2012)
+    #         # except:  # pylint: disable=bare-except
+    #         #     print("You should change vis.CNN(), if you want to save the feature images for different dataset")
+
+    # print('Evaluation')
+    # test_loss, test_acc, n_batch = 0, 0, 0
+    # for X_test_a, y_test_a in tl.iterate.minibatches(
+    #         X_test, y_test, batch_size, shuffle=True):
+    #     dp_dict = tl.utils.dict_to_one(net.all_drop)  # disable noise layers
+    #     feed_dict = {x: X_test_a, y_: y_test_a}
+    #     feed_dict.update(dp_dict)
+    #     err, ac = sess.run([cost, acc], feed_dict=feed_dict)
+    #     test_loss += err
+    #     test_acc += ac
+    #     n_batch += 1
+    # print("   test loss: %f" % (test_loss / n_batch))
+    # print("   test acc: %f" % (test_acc / n_batch))
+
     for epoch in range(n_epoch):
         start_time = time.time()
-        for X_train_a, y_train_a in tl.iterate.minibatches(
-                X_train, y_train, batch_size, shuffle=True):
-            feed_dict = {x: X_train_a, y_: y_train_a}
-            feed_dict.update(net.all_drop)  # enable noise layers
+        # In fact y_train_a_1 is y_
+        for X_train_a_1, y_train_a_1, \
+            X_train_a_2, y_train_a_2 \
+            in zip(
+                tl.iterate.minibatches(
+                X_train_1, y_train_1,
+                    batch_size, shuffle=True),
+                tl.iterate.minibatches(
+                X_train_2, y_train_2,
+                    batch_size, shuffle=True)):
+            feed_dict = {x_1: X_train_a_1, x_2: X_train_a_2, y_: y_train_a_1}
+
+            # enable noise layers when not output
+            feed_dict.update(net.all_drop)
+
+            # Run on the graph
             sess.run(train_op, feed_dict=feed_dict)
 
         # Show train information every print_freq
         if epoch + 1 == 1 or (epoch + 1) % print_freq == 0:
             print("Epoch %d of %d took %fs" % (epoch + 1, n_epoch,
                                                time.time() - start_time))
+
             train_loss, train_acc, n_batch = 0, 0, 0
-            for X_train_a, y_train_a in tl.iterate.minibatches(
-                    X_train, y_train, batch_size, shuffle=True):
-                dp_dict = tl.utils.dict_to_one(
-                    net.all_drop)  # disable noise layers
-                feed_dict = {x: X_train_a, y_: y_train_a}
+
+            for X_train_a_1, y_train_a_1, \
+                X_train_a_2, y_train_a_2 \
+                in zip(
+                    tl.iterate.minibatches(
+                    X_train_1, y_train_1,
+                        batch_size, shuffle=True),
+                    tl.iterate.minibatches(
+                    X_train_2, y_train_2,
+                        batch_size, shuffle=True)):
+
+                # disable noise layers
+                dp_dict = tl.utils.dict_to_one(net.all_drop)
+
+                feed_dict = {
+                    x_1: X_train_a_1,
+                    x_2: X_train_a_2,
+                    y_: y_train_a_1
+                }
                 feed_dict.update(dp_dict)
                 err, ac = sess.run([cost, acc], feed_dict=feed_dict)
                 train_loss += err
@@ -194,12 +343,23 @@ def main_test_cnn_layer():
                 n_batch += 1
             print("   train loss: %f" % (train_loss / n_batch))
             print("   train acc: %f" % (train_acc / n_batch))
+
+            # Now Start validation data process
+
             val_loss, val_acc, n_batch = 0, 0, 0
-            for X_val_a, y_val_a in tl.iterate.minibatches(
-                    X_val, y_val, batch_size, shuffle=True):
+            for X_val_a_1, y_val_a_1, \
+                X_val_a_2, y_val_a_2 \
+                in zip(
+                    tl.iterate.minibatches(
+                    X_val_1, y_val_1,
+                        batch_size, shuffle=True),
+                    tl.iterate.minibatches(
+                    X_val_2, y_val_2,
+                        batch_size, shuffle=True)):
+
                 dp_dict = tl.utils.dict_to_one(
                     net.all_drop)  # disable noise layers
-                feed_dict = {x: X_val_a, y_: y_val_a}
+                feed_dict = {x_1: X_val_a_1, x_2: X_val_a_2, y_: y_val_a_1}
                 feed_dict.update(dp_dict)
                 err, ac = sess.run([cost, acc], feed_dict=feed_dict)
                 val_loss += err
@@ -214,10 +374,17 @@ def main_test_cnn_layer():
 
     print('Evaluation')
     test_loss, test_acc, n_batch = 0, 0, 0
-    for X_test_a, y_test_a in tl.iterate.minibatches(
-            X_test, y_test, batch_size, shuffle=True):
+    for X_test_a_1, y_test_a_1, \
+        X_test_a_2, y_test_a_2 \
+        in zip(
+            tl.iterate.minibatches(
+            X_test_1, y_test_1,
+                batch_size, shuffle=True),
+            tl.iterate.minibatches(
+            X_test_2, y_test_2,
+                batch_size, shuffle=True)):
         dp_dict = tl.utils.dict_to_one(net.all_drop)  # disable noise layers
-        feed_dict = {x: X_test_a, y_: y_test_a}
+        feed_dict = {x_1: X_test_a_1, x_2: X_test_a_2, y_: y_test_a_1}
         feed_dict.update(dp_dict)
         err, ac = sess.run([cost, acc], feed_dict=feed_dict)
         test_loss += err
@@ -228,4 +395,4 @@ def main_test_cnn_layer():
 
 
 if __name__ == "__main__":
-    main_test_cnn_layer()
+    MCNN_mpr_spectrogram()
