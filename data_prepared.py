@@ -3,13 +3,45 @@
 #########################################################################
 # File Name   :  data_prepared.py
 # author      :   Tiangang Zhou
-# e-Mail      :  tg_zhou@pku.edu.cn 
+# e-Mail      :  tg_zhou@pku.edu.cn
 # created at  :  2018-07-01 00:09
-# purpose     :  
+# purpose     :
 #########################################################################
 
-
 # TODO: Add description about .npy file structure
+# **********************************************************
+# About Spectrogram .npy file
+# In `spectrogram.py` file
+#
+# @see spectrogram_generate()
+# @see spectrogram_plot()
+# @see spectrogram_image_save()
+#
+# Function Relationship:
+# spectrogram_generate() invoke these two function
+# :spectrogram_plot(): To plot && save image in the current directory,
+# and the path can be set in this function.
+# :spectrogram_image_save(): To generate .npy file in the current directory,
+# and the path can be set in this function.
+#
+# :spectrogram_generate(): to prepared data and generate file
+
+# About mpr .npy file
+# In `mpr.py` file
+#
+# @see mpr_generate()
+# @see mpr_plot()
+# @see mpr_image_save()
+#
+# Function Relationship:
+# mpr_generate() invoke these two function
+# :mpr_plot(): To generate plot and save image in the current directory
+# and the path can be set in this function.
+# :mpr_image_save(): To generate .npy file in the current directory,
+# and the path can be set in this function.
+#
+# :mpr_generate(): to prepared data and generate file
+
 
 # **********************************************************
 # TODO
@@ -57,6 +89,3 @@ def load_spectrogram_dataset():
     """
 
     # return X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2
-
-
-
