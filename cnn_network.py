@@ -44,23 +44,28 @@ def load_datasets(image_type_1: str, image_type_2: str):
     if image_type_1 == 'mpr':
         X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1 = \
             load_mpr_dataset()
+        channel_1 = 96
     elif image_type_1 == 'spectrogram':
         X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1 = \
             load_spectrogram_dataset()
+        channel_1 = 16
     else:
         print("Not a valid image type")
 
     if image_type_2 == 'mpr':
         X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = \
             load_mpr_dataset()
+        channel_2 = 96
     elif image_type_2 == 'spectrogram':
         X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = \
             load_spectrogram_dataset()
+        channel_2 = 16
     else:
         print("Not a valid image type")
 
     return X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1, \
-        X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2
+        X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2, \
+        channel_1, channel_2
 
 
 def MCNN_mpr_mpr():
@@ -76,7 +81,8 @@ def MCNN_spectrogram_spectrogram():
     :returns: TODO
 
     """
-    main_test_cnn_layer_mpr_spectrogram(load_datasets('spectrogram', 'spectrogram'))
+    main_test_cnn_layer_mpr_spectrogram(
+        load_datasets('spectrogram', 'spectrogram'))
 
 
 def MCNN_mpr_spectrogram():
@@ -89,33 +95,43 @@ def MCNN_mpr_spectrogram():
 
 def main_test_cnn_layer_mpr_spectrogram(
         X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1, X_train_2,
-        y_train_2, X_val_2, y_val_2, X_test_2, y_test_2):
+        y_train_2, X_val_2, y_val_2, X_test_2, y_test_2, channel_1, channel_2):
 
     # **********************************************************
     # TODO
     # This Place is to Prepared data
-    # :X_train_1: ? * 32 * 32 * 2 ndarray(float)
-    # :X_train_2: ? * 32 * 32 * 2 ndarray(float)
-    # :X_train_1: ? ndarray(int64)
-    # :X_train_2: ? ndarray(int64)
+    # :X_train_1: train_batch * 32 * 32 * 96  ndarray(float)
+    # :X_train_2: train_batch * 32 * 32 * 16  ndarray(float)
+    # :y_train_1: train_batch                 ndarray(int64)
+    # :y_train_2: train_batch                 ndarray(int64)
 
-    # :X_val_1: ? * 32 * 32 * 2 ndarray(float)
-    # :X_val_2: ? * 32 * 32 * 2 ndarray(float)
-    # :X_val_1: ? ndarray(int64)
-    # :X_val_2: ? ndarray(int64)
+    # :X_val_1: val_batch * 32 * 32 * 96    ndarray(float)
+    # :X_val_2: val_batch * 32 * 32 * 16    ndarray(float)
+    # :y_val_1: val_batch                   ndarray(int64)
+    # :y_val_2: val_batch                   ndarray(int64)
 
-    # :X_test_1: ? * 32 * 32 * 2 ndarray(float)
-    # :X_test_2: ? * 32 * 32 * 2 ndarray(float)
-    # :X_test_1: ? ndarray(int64)
-    # :X_test_2: ? ndarray(int64)
+    # :X_test_1: test_batch * 32 * 32 * 96   ndarray(float)
+    # :X_test_2: test_batch * 32 * 32 * 16   ndarray(float)
+    # :y_test_1: test_batch                  ndarray(int64)
+    # :y_test_2: test_batch                  ndarray(int64)
 
-    # ATTENTION: X_train can be mpr data or spectrogram data, but should prepared sperately.
-    # btw, I have no idea how to prepared data sperated for two net, multicolumn CNN is NOT implemented yet
+    # (optional)
+    # By conventional, val_batch : train_batch : val_batch = 1 : 3 : 1
+
+    # ATTENTION: Please inplement the data output in the function:
+    #   @see load_mpr_dataset()
+    #   @see load_spectrogram_dataset()
+    # These two functions are at the top of the cnn_network.py
+
+    # Btw, Please specify the instrument types when handle with the data
+    output_types = 10
+
+    # **********************************************************
+    # The following part is about the MCNN network
 
     # This is official mnist data
     # X_train, y_train, X_val, y_val, X_test, y_test = tl.files.load_mnist_dataset(
     #     shape=(-1, 28, 28, 1))
-    # **********************************************************
 
     sess = tf.InteractiveSession()
 
@@ -126,11 +142,11 @@ def main_test_cnn_layer_mpr_spectrogram(
 
     x_1 = tf.placeholder(
         tf.float32, shape=[batch_size, 32, 32,
-                           2])  # [batch_size, height, width, channels]
+                           channel_1])  # [batch_size, height, width, channels]
 
     x_2 = tf.placeholder(
         tf.float32, shape=[batch_size, 32, 32,
-                           2])  # [batch_size, height, width, channels]
+                           channel_2])  # [batch_size, height, width, channels]
     y_ = tf.placeholder(tf.int64, shape=[batch_size])
 
     net_1 = tl.layers.InputLayer(x_1, name='input_1')
@@ -207,7 +223,7 @@ def main_test_cnn_layer_mpr_spectrogram(
     net = tl.layers.DropoutLayer(net, keep=0.5, name='drop1')
     net = tl.layers.DenseLayer(net, 256, act=tf.nn.relu, name='relu1')
     net = tl.layers.DropoutLayer(net, keep=0.5, name='drop2')
-    net = tl.layers.DenseLayer(net, 10, act=None, name='output')
+    net = tl.layers.DenseLayer(net, output_types, act=None, name='output')
 
     y = net.outputs
 
@@ -217,7 +233,7 @@ def main_test_cnn_layer_mpr_spectrogram(
     acc = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
     # train
-    n_epoch = 3200
+    n_epoch = 400
     learning_rate = 0.0001
     print_freq = 10
 
