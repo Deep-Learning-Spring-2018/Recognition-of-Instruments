@@ -96,18 +96,18 @@ def main_test_cnn_layer_mpr_spectrogram(
     # This Place is to Prepared data
     # :X_train_1: ? * 32 * 32 * 2 ndarray(float)
     # :X_train_2: ? * 32 * 32 * 2 ndarray(float)
-    # :X_train_1: ? * 2 ndarray(int64)
-    # :X_train_2: ? * 2 ndarray(int64)
+    # :X_train_1: ? ndarray(int64)
+    # :X_train_2: ? ndarray(int64)
 
     # :X_val_1: ? * 32 * 32 * 2 ndarray(float)
     # :X_val_2: ? * 32 * 32 * 2 ndarray(float)
-    # :X_val_1: ? * 2 ndarray(int64)
-    # :X_val_2: ? * 2 ndarray(int64)
+    # :X_val_1: ? ndarray(int64)
+    # :X_val_2: ? ndarray(int64)
 
     # :X_test_1: ? * 32 * 32 * 2 ndarray(float)
     # :X_test_2: ? * 32 * 32 * 2 ndarray(float)
-    # :X_test_1: ? * 2 ndarray(int64)
-    # :X_test_2: ? * 2 ndarray(int64)
+    # :X_test_1: ? ndarray(int64)
+    # :X_test_2: ? ndarray(int64)
 
     # ATTENTION: X_train can be mpr data or spectrogram data, but should prepared sperately.
     # btw, I have no idea how to prepared data sperated for two net, multicolumn CNN is NOT implemented yet
