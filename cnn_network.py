@@ -8,32 +8,18 @@
 # purpose     :
 #########################################################################
 
-import numpy as np
-import matplotlib.pyplot as plt
 import time
+
 import tensorflow as tf
 import tensorlayer as tl
+
+from data_prepared import *
 
 tf.logging.set_verbosity(tf.logging.DEBUG)
 tl.logging.set_verbosity(tl.logging.DEBUG)
 
 
-def load_mpr_dataset():
-    """load the multilayer Recurrent Plot dataset
-    :returns: TODO
 
-    """
-
-    return X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1
-
-
-def load_spectrogram_dataset():
-    """load the spectrogram datasets
-    :returns: TODO
-
-    """
-
-    return X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2
 
 
 def load_datasets(image_type_1: str, image_type_2: str):
