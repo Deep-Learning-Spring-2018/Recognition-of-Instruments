@@ -94,7 +94,7 @@ def load_mpr_dataset():
     X_val_1 = mpr_x[train_num:train_num + test_val_num]
     y_val_1 = label[train_num:train_num + test_val_num]
     X_test_1 = mpr_x[train_num + test_val_num:train_num + test_val_num * 2]
-    y_test_1 = mpr_x[train_num + test_val_num:train_num + test_val_num * 2]
+    y_test_1 = label[train_num + test_val_num:train_num + test_val_num * 2]
     return X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1
 
 
@@ -110,7 +110,7 @@ def load_spectrogram_dataset():
     X_val_2 = spectrogram_x[train_num:train_num + test_val_num]
     y_val_2 = label[train_num:train_num + test_val_num]
     X_test_2 = spectrogram_x[train_num + test_val_num:train_num + test_val_num * 2]
-    y_test_2 = spectrogram_x[train_num + test_val_num:train_num + test_val_num * 2]
+    y_test_2 = label[train_num + test_val_num:train_num + test_val_num * 2]
     return X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2
 
 
