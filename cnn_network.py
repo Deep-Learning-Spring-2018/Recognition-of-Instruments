@@ -13,7 +13,7 @@ import time
 import tensorflow as tf
 import tensorlayer as tl
 
-from data_prepared import *
+import data_prepared
 
 tf.logging.set_verbosity(tf.logging.DEBUG)
 tl.logging.set_verbosity(tl.logging.DEBUG)
@@ -26,11 +26,11 @@ def load_datasets(image_type_1: str, image_type_2: str):
     """
     if image_type_1 == 'mpr':
         X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1 = \
-            load_mpr_dataset()
+            data_prepared.load_mpr_dataset()
         channel_1 = 96
     elif image_type_1 == 'spectrogram':
         X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1 = \
-            load_spectrogram_dataset()
+            data_prepared.load_spectrogram_dataset()
         channel_1 = 16
     else:
         print("Not a valid image type")
@@ -38,19 +38,19 @@ def load_datasets(image_type_1: str, image_type_2: str):
 
     if image_type_2 == 'mpr':
         X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = \
-            load_mpr_dataset()
+            data_prepared.load_mpr_dataset()
         channel_2 = 96
     elif image_type_2 == 'spectrogram':
         X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = \
-            load_spectrogram_dataset()
+            data_prepared.load_spectrogram_dataset()
         channel_2 = 16
     else:
         print("Not a valid image type")
         return
 
-    return X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1, \
-           X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2, \
-           channel_1, channel_2
+    return [X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1], \
+           [X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2], \
+        channel_1, channel_2
 
 
 def MCNN_mpr_mpr():
@@ -79,8 +79,9 @@ def MCNN_mpr_spectrogram():
 
 
 def main_test_cnn_layer_mpr_spectrogram(
-        X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1, X_train_2,
-        y_train_2, X_val_2, y_val_2, X_test_2, y_test_2, channel_1, channel_2):
+        dataset_1,
+        dataset_2,
+        channel_1, channel_2):
     # **********************************************************
     # TODO
     # This Place is to Prepared data
@@ -116,6 +117,10 @@ def main_test_cnn_layer_mpr_spectrogram(
     # This is official mnist data
     # X_train, y_train, X_val, y_val, X_test, y_test = tl.files.load_mnist_dataset(
     #     shape=(-1, 28, 28, 1))
+
+    # Unpack data list
+    X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1 = dataset_1
+    X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = dataset_2
 
     sess = tf.InteractiveSession()
 
@@ -297,10 +302,10 @@ def main_test_cnn_layer_mpr_spectrogram(
         for X_train_a_1, y_train_a_1, \
             X_train_a_2, y_train_a_2 \
                 in zip(
-            tl.iterate.minibatches(
+                    tl.iterate.minibatches(
                 X_train_1, y_train_1,
                 batch_size, shuffle=True),
-            tl.iterate.minibatches(
+                    tl.iterate.minibatches(
                 X_train_2, y_train_2,
                 batch_size, shuffle=True)):
             feed_dict = {x_1: X_train_a_1, x_2: X_train_a_2, y_: y_train_a_1}
@@ -321,10 +326,10 @@ def main_test_cnn_layer_mpr_spectrogram(
             for X_train_a_1, y_train_a_1, \
                 X_train_a_2, y_train_a_2 \
                     in zip(
-                tl.iterate.minibatches(
+                        tl.iterate.minibatches(
                     X_train_1, y_train_1,
                     batch_size, shuffle=True),
-                tl.iterate.minibatches(
+                        tl.iterate.minibatches(
                     X_train_2, y_train_2,
                     batch_size, shuffle=True)):
                 # disable noise layers
@@ -349,10 +354,10 @@ def main_test_cnn_layer_mpr_spectrogram(
             for X_val_a_1, y_val_a_1, \
                 X_val_a_2, y_val_a_2 \
                     in zip(
-                tl.iterate.minibatches(
+                        tl.iterate.minibatches(
                     X_val_1, y_val_1,
                     batch_size, shuffle=True),
-                tl.iterate.minibatches(
+                        tl.iterate.minibatches(
                     X_val_2, y_val_2,
                     batch_size, shuffle=True)):
                 dp_dict = tl.utils.dict_to_one(
@@ -375,10 +380,10 @@ def main_test_cnn_layer_mpr_spectrogram(
     for X_test_a_1, y_test_a_1, \
         X_test_a_2, y_test_a_2 \
             in zip(
-        tl.iterate.minibatches(
+                tl.iterate.minibatches(
             X_test_1, y_test_1,
             batch_size, shuffle=True),
-        tl.iterate.minibatches(
+                tl.iterate.minibatches(
             X_test_2, y_test_2,
             batch_size, shuffle=True)):
         dp_dict = tl.utils.dict_to_one(net.all_drop)  # disable noise layers
