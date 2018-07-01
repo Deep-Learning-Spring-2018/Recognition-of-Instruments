@@ -8,8 +8,9 @@
 # purpose     :
 #########################################################################
 
-import glob
+from pathlib import Path
 
+import numpy as np
 import soundfile as sf
 
 import mpr
@@ -19,7 +20,7 @@ import spectrogram
 class aiff(object):
     """Docstring for aiff. """
 
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: Path):
         """Initial aiff resource file.
 
         :path: TODO
@@ -31,7 +32,7 @@ class aiff(object):
         self._max_layers = 6
         self._temporal_point = 8
 
-        aiff_files = glob.glob(path + '/**/*.aif', recursive=True)
+        aiff_files = path.glob("*.aif")
         aiff_datas = []
         samplerate_list = []
         std_samplerate = 44100
@@ -63,7 +64,7 @@ class aiff(object):
             last_temporal_data_point = samples - self.samples_calc(1) - 1
 
             temporal_data_point = [
-                int(last_temporal_data_point / 2**(8 - i))
+                int(last_temporal_data_point / 2 ** (8 - i))
                 for i in range(8)
             ]
             temporal_data_point = temporal_data_point
@@ -72,23 +73,23 @@ class aiff(object):
 
         self._temporal_data_point_list = temporal_data_point_list
 
-
-    def mpr_process(self) -> None:
+    def mpr_process(self):
         """
         :returns: None
 
         """
         mpr_obj = mpr.mpr(self._aiff_datas, self._temporal_data_point_list,
                           self._temporal_point, self._max_layers)
-        mpr_obj.mpr_generate()
+        return np.asarray(mpr_obj.mpr_generate())
 
-    def spectrogram_process(self) -> None:
+    def spectrogram_process(self):
         """Processing spectrogram
         :returns: TODO
 
         """
-        spectrogram_obj = spectrogram.spectrogram(self._aiff_datas, self._temporal_data_point_list, self._temporal_point)
-        spectrogram_obj.spectrogram_generate()
+        spectrogram_obj = spectrogram.spectrogram(self._aiff_datas, self._temporal_data_point_list,
+                                                  self._temporal_point)
+        return np.asarray(spectrogram_obj.spectrogram_generate())
 
     def samples_calc(self, layer: int) -> int:
         """Calculate the layer samples
@@ -97,14 +98,40 @@ class aiff(object):
         :returns: TODO
 
         """
-        return 2**(5 + 2 * (self._max_layers - layer))
+        return 2 ** (5 + 2 * (self._max_layers - layer))
+
+    def get_spectrogram(self):
+        pass
+
+    def get_mrp(self):
+        pass
 
 
 if __name__ == "__main__":
-    VIOLIN_PATH = "./resource/violin"
-    my_obj = aiff(VIOLIN_PATH)
-    my_obj.spectrogram_process()
-    my_obj.mpr_process()
+    instruments = ['AltoSax', 'BassFlute', 'BbClarinet', 'Cello', 'EbClarinet', 'Horn', 'Oboe', 'SopSax',
+                   'TenorTrombone', 'Trumpet', 'Viola', 'Violin']
+    x_mpr = []
+    x_spectrogram = []
+    y = []
+    for i, instrument in enumerate(instruments):
+        print(instrument)
+        instrument_path = Path("./resource") / instrument
+        aiff_file = aiff(instrument_path)
+        _mpr = aiff_file.mpr_process()
+        batch_num = _mpr.shape[0]
+        _mpr.transpose((0, 3, 4, 5, 1, 2))
+        _mpr = _mpr.reshape((batch_num, 32, 32, 96))
+        _spectrogram = aiff_file.spectrogram_process()
+        _spectrogram.transpose((0, 2, 3, 4, 1))
+        _spectrogram = _spectrogram.reshape((batch_num, 32, 32, 16))
+        _label = np.zeros((len(instruments)))
+        _label[i] = 1
+        x_mpr += [_mpr[i] for i in range(batch_num)]
+        x_spectrogram += [_spectrogram[i] for i in range(batch_num)]
+        y += [_label for i in range(batch_num)]
+    np.save("spectrogram_x", x_spectrogram)
+    np.save("mpr_x", x_mpr)
+    np.save("label", y)
     # data, samplerate = sf.read(
     #     "./resourse/violin/Violin.arco.ff.sulA.stereo/Violin.arco.ff.sulA.E5.stereo.aif"
     # )

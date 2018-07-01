@@ -70,22 +70,58 @@
 # These two functions are at the top of the cnn_network.py
 
 # Btw, Please specify the instrument types when handle with the data
-output_types = 10
+import numpy as np
+
+output_types = 13
+# TODO: The input y should be one-hot input i.e. batch*output_types ndarray, please check NN to make sure
+# TODO: The number of instruments excluding flute is 13, please check NN to make sure
+# TODO: shuffle_data should be called before loading data set, please check NN to make sure
+label = np.load("label.npy")
+mpr_x = np.load("mpr_x.npy")
+spectrogram_x = np.load("spectrogram_x.npy")
+batch_num = label.shape[0]
 
 
 def load_mpr_dataset():
     """load the multilayer Recurrent Plot dataset
-    :returns: TODO
+    :returns: X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1
 
     """
-
-    # return X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1
+    train_num = int(batch_num * 3 / 5)
+    test_val_num = int(batch_num / 5)
+    X_train_1 = mpr_x[0:train_num]
+    y_train_1 = label[0:train_num]
+    X_val_1 = mpr_x[train_num:train_num + test_val_num]
+    y_val_1 = label[train_num:train_num + test_val_num]
+    X_test_1 = mpr_x[train_num + test_val_num:train_num + test_val_num * 2]
+    y_test_1 = mpr_x[train_num + test_val_num:train_num + test_val_num * 2]
+    return X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1
 
 
 def load_spectrogram_dataset():
     """load the spectrogram datasets
-    :returns: TODO
+    :returns: X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2
 
     """
+    train_num = int(batch_num * 3 / 5)
+    test_val_num = int(batch_num / 5)
+    X_train_2 = spectrogram_x[0:train_num]
+    y_train_2 = label[0:train_num]
+    X_val_2 = spectrogram_x[train_num:train_num + test_val_num]
+    y_val_2 = label[train_num:train_num + test_val_num]
+    X_test_2 = spectrogram_x[train_num + test_val_num:train_num + test_val_num * 2]
+    y_test_2 = spectrogram_x[train_num + test_val_num:train_num + test_val_num * 2]
+    return X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2
 
-    # return X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2
+
+def shuffle_data() -> None:
+    """
+    Randomly shuffles the data. Remember to call before loading data set
+    :return: None
+    """
+    state = np.random.get_state()
+    np.random.shuffle(label)
+    np.random.set_state(state)
+    np.random.shuffle(mpr_x)
+    np.random.set_state(state)
+    np.random.shuffle(spectrogram_x)

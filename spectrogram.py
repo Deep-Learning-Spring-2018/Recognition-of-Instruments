@@ -1,9 +1,6 @@
-from unittest import TestCase, main
-
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal
-import soundfile as sf
 from scipy.signal import get_window
 from skimage.measure import block_reduce
 
@@ -36,8 +33,7 @@ class spectrogram(object):
                                    self._temporal_data_point_list[audio_index],
                                    audio_index))
 
-        self.spectrogram_image_save(spectrogram_image)
-        self.spectrogram_plot(spectrogram_image)
+        return spectrogram_image
 
     def spectrogram_plot(self, spectrogram_image, audio_index=5) -> None:
         """Plot spectrogram image for showing
@@ -129,20 +125,4 @@ def spectrogram_single(data,
     return ret
 
 
-class SpectrogramTestCase(TestCase):
-    def test_generate_spectrogram_shape(self):
-        with open('/home/bill/Documents/curriculum/深度学习/code/test.aif',
-                  'rb') as f:
-            data, rate = sf.read(f)
-        spectrum = spectrogram_single(
-            data=data,
-            sample_rate=rate,
-            acquisition_points=[128, 256, 512, 1024, 2048, 4096],
-            hop=0.25,
-            resolution=32,
-            spectrogram_length=32)
-        self.assertEqual(spectrum.shape, (6, 32, 32, 2))
 
-
-if __name__ == '__main__':
-    main()

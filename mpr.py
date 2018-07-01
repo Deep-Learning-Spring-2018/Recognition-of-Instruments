@@ -8,11 +8,10 @@
 # purpose     :
 #########################################################################
 
-import glob
-import numpy as np
 import matplotlib.pyplot as plt
-from skimage.measure import block_reduce
+import numpy as np
 from numba import jit
+from skimage.measure import block_reduce
 
 
 class mpr(object):
@@ -35,7 +34,7 @@ class mpr(object):
         self._temporal_point = temporal_point
         self._temporal_data_point_list = temporal_data_point_list
 
-    def mpr_generate(self) -> None:
+    def mpr_generate(self):
         """Some visualing test
 
         ::
@@ -108,10 +107,7 @@ class mpr(object):
 
             mpr_image.append(np.array(mpr_matrices))
 
-            print("{} file is processed".format(audio_index + 1))
-
-        self.mpr_plot(mpr_image)
-        self.mpr_image_save(mpr_image)
+        return mpr_image
 
     def mpr_plot(self, mpr_image, audio_index=5) -> None:
         """Plot mpr image for showing
