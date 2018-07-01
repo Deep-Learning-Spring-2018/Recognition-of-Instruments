@@ -22,6 +22,22 @@ class SpectrogramTestCase(TestCase):
         X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = load_spectrogram_dataset()
         self.assertEqual(X_train_1.shape[1:], (32, 32, 96))
         self.assertEqual(y_train_1.shape[1:], (12,))
+        self.assertEqual(X_train_1.shape[0], y_train_1.shape[0])
+        self.assertEqual(X_test_1.shape[1:], (32, 32, 96))
+        self.assertEqual(y_test_1.shape[1:], (12,))
+        self.assertEqual(X_test_1.shape[0], y_test_1.shape[0])
+        self.assertEqual(X_val_1.shape[1:], (32, 32, 96))
+        self.assertEqual(y_val_1.shape[1:], (12,))
+        self.assertEqual(X_val_1.shape[0], y_val_1.shape[0])
+        self.assertEqual(X_train_2.shape[1:], (32, 32, 16))
+        self.assertEqual(y_train_2.shape[1:], (12,))
+        self.assertEqual(X_train_2.shape[0], y_train_2.shape[0])
+        self.assertEqual(X_test_2.shape[1:], (32, 32, 16))
+        self.assertEqual(y_test_2.shape[1:], (12,))
+        self.assertEqual(X_test_2.shape[0], y_test_2.shape[0])
+        self.assertEqual(X_val_2.shape[1:], (32, 32, 16))
+        self.assertEqual(y_val_2.shape[1:], (12,))
+        self.assertEqual(X_val_2.shape[0], y_val_2.shape[0])
 
 
 if __name__ == '__main__':
