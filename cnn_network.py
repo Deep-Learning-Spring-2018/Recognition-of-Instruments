@@ -16,7 +16,6 @@ import tensorlayer as tl
 import data_prepared
 
 tf.logging.set_verbosity(tf.logging.DEBUG)
-tl.logging.set_verbosity(tl.logging.DEBUG)
 
 
 def load_datasets(image_type_1: str, image_type_2: str):
@@ -58,7 +57,9 @@ def MCNN_mpr_mpr():
     :returns: TODO
 
     """
-    main_test_cnn_layer_mpr_spectrogram(load_datasets('mpr', 'mpr'))
+    dataset_1, dataset_2, channel_1, channel_2 = load_datasets('mpr', 'mpr')
+    main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
+                                        channel_2)
 
 
 def MCNN_spectrogram_spectrogram():
@@ -66,8 +67,10 @@ def MCNN_spectrogram_spectrogram():
     :returns: TODO
 
     """
-    main_test_cnn_layer_mpr_spectrogram(
-        load_datasets('spectrogram', 'spectrogram'))
+    dataset_1, dataset_2, channel_1, channel_2 = load_datasets(
+        'spectrogram', 'spectrogram')
+    main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
+                                        channel_2)
 
 
 def MCNN_mpr_spectrogram():
@@ -75,13 +78,14 @@ def MCNN_mpr_spectrogram():
     :returns: TODO
 
     """
-    main_test_cnn_layer_mpr_spectrogram(load_datasets('mpr', 'spectrogram'))
+    dataset_1, dataset_2, channel_1, channel_2 = load_datasets(
+        'mpr', 'spectrogram')
+    main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
+                                        channel_2)
 
 
-def main_test_cnn_layer_mpr_spectrogram(
-        dataset_1,
-        dataset_2,
-        channel_1, channel_2):
+def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
+                                        channel_2):
     # **********************************************************
     # TODO
     # This Place is to Prepared data
@@ -109,7 +113,7 @@ def main_test_cnn_layer_mpr_spectrogram(
     # These two functions are at the top of the cnn_network.py
 
     # Btw, Please specify the instrument types when handle with the data
-    output_types = 10
+    output_types = 13
 
     # **********************************************************
     # The following part is about the MCNN network
@@ -121,6 +125,15 @@ def main_test_cnn_layer_mpr_spectrogram(
     # Unpack data list
     X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1 = dataset_1
     X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = dataset_2
+
+    print(X_train_1.shape, y_train_1.shape)
+    print(X_train_2.shape, y_train_2.shape)
+
+    print(X_val_1.shape, y_val_1.shape)
+    print(X_val_2.shape, y_val_2.shape)
+
+    print(X_test_1.shape, y_test_1.shape)
+    print(X_test_2.shape, y_test_2.shape)
 
     sess = tf.InteractiveSession()
 
@@ -212,7 +225,8 @@ def main_test_cnn_layer_mpr_spectrogram(
     net = tl.layers.DropoutLayer(net, keep=0.5, name='drop1')
     net = tl.layers.DenseLayer(net, 256, act=tf.nn.relu, name='relu1')
     net = tl.layers.DropoutLayer(net, keep=0.5, name='drop2')
-    net = tl.layers.DenseLayer(net, output_types, act=None, name='output')
+    net = tl.layers.DenseLayer(
+        net, output_types, act=tf.identity, name='output')
 
     y = net.outputs
 
@@ -299,8 +313,8 @@ def main_test_cnn_layer_mpr_spectrogram(
     for epoch in range(n_epoch):
         start_time = time.time()
         # In fact y_train_a_1 is y_
-        for X_train_a_1, y_train_a_1, \
-            X_train_a_2, y_train_a_2 \
+        for [X_train_a_1, X_train_a_2],\
+            [y_train_a_1, y_train_a_2] \
                 in zip(
                     tl.iterate.minibatches(
                 X_train_1, y_train_1,
@@ -323,8 +337,8 @@ def main_test_cnn_layer_mpr_spectrogram(
 
             train_loss, train_acc, n_batch = 0, 0, 0
 
-            for X_train_a_1, y_train_a_1, \
-                X_train_a_2, y_train_a_2 \
+            for [X_train_a_1, X_train_a_2],\
+                [y_train_a_1, y_train_a_2] \
                     in zip(
                         tl.iterate.minibatches(
                     X_train_1, y_train_1,
@@ -351,8 +365,8 @@ def main_test_cnn_layer_mpr_spectrogram(
             # Now Start validation data process
 
             val_loss, val_acc, n_batch = 0, 0, 0
-            for X_val_a_1, y_val_a_1, \
-                X_val_a_2, y_val_a_2 \
+            for [X_val_a_1, y_val_a_1],\
+                [X_val_a_2, y_val_a_2] \
                     in zip(
                         tl.iterate.minibatches(
                     X_val_1, y_val_1,
@@ -377,8 +391,8 @@ def main_test_cnn_layer_mpr_spectrogram(
 
     print('Evaluation')
     test_loss, test_acc, n_batch = 0, 0, 0
-    for X_test_a_1, y_test_a_1, \
-        X_test_a_2, y_test_a_2 \
+    for [X_test_a_1, X_test_a_2],\
+        [y_test_a_1, y_test_a_2] \
             in zip(
                 tl.iterate.minibatches(
             X_test_1, y_test_1,
