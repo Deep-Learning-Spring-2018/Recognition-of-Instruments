@@ -73,8 +73,9 @@
 import numpy as np
 
 output_types = 13
-# TODO: The input y should be one-hot input i.e. batch*output_types ndarray, please check NN to make sure
-# TODO: The number of instruments excluding flute is 13, please check NN to make sure
+# DONE: The input y should be one-hot input i.e. batch*output_types ndarray, please check NN to make sure
+# FIX: Not use one-hot input 
+# TODO: The number of instruments including flute is 13, please check NN to make sure
 # TODO: shuffle_data should be called before loading data set, please check NN to make sure
 label = np.load("label.npy")
 mpr_x = np.load("mpr_x.npy")
@@ -90,11 +91,11 @@ def load_mpr_dataset():
     train_num = int(batch_num * 3 / 5)
     test_val_num = int(batch_num / 5)
     X_train_1 = mpr_x[0:train_num]
-    y_train_1 = label[0:train_num]
+    y_train_1 = np.argmax(label[0:train_num], axis=1)
     X_val_1 = mpr_x[train_num:train_num + test_val_num]
-    y_val_1 = label[train_num:train_num + test_val_num]
+    y_val_1 = np.argmax(label[train_num:train_num + test_val_num], axis=1)
     X_test_1 = mpr_x[train_num + test_val_num:train_num + test_val_num * 2]
-    y_test_1 = label[train_num + test_val_num:train_num + test_val_num * 2]
+    y_test_1 = np.argmax(label[train_num + test_val_num:train_num + test_val_num * 2], axis=1)
     return X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1
 
 
@@ -106,11 +107,11 @@ def load_spectrogram_dataset():
     train_num = int(batch_num * 3 / 5)
     test_val_num = int(batch_num / 5)
     X_train_2 = spectrogram_x[0:train_num]
-    y_train_2 = label[0:train_num]
+    y_train_2 = np.argmax(label[0:train_num], axis=1)
     X_val_2 = spectrogram_x[train_num:train_num + test_val_num]
-    y_val_2 = label[train_num:train_num + test_val_num]
+    y_val_2 = np.argmax(label[train_num:train_num + test_val_num], axis=1)
     X_test_2 = spectrogram_x[train_num + test_val_num:train_num + test_val_num * 2]
-    y_test_2 = label[train_num + test_val_num:train_num + test_val_num * 2]
+    y_test_2 = np.argmax(label[train_num + test_val_num:train_num + test_val_num * 2], axis=1)
     return X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2
 
 

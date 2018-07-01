@@ -313,8 +313,8 @@ def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
     for epoch in range(n_epoch):
         start_time = time.time()
         # In fact y_train_a_1 is y_
-        for [X_train_a_1, X_train_a_2],\
-            [y_train_a_1, y_train_a_2] \
+        for [X_train_a_1, y_train_a_1],\
+            [X_train_a_2, y_train_a_2] \
                 in zip(
                     tl.iterate.minibatches(
                 X_train_1, y_train_1,
@@ -337,8 +337,8 @@ def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
 
             train_loss, train_acc, n_batch = 0, 0, 0
 
-            for [X_train_a_1, X_train_a_2],\
-                [y_train_a_1, y_train_a_2] \
+            for [X_train_a_1, y_train_a_1],\
+                [X_train_a_2, y_train_a_2] \
                     in zip(
                         tl.iterate.minibatches(
                     X_train_1, y_train_1,
@@ -365,8 +365,8 @@ def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
             # Now Start validation data process
 
             val_loss, val_acc, n_batch = 0, 0, 0
-            for [X_val_a_1, y_val_a_1],\
-                [X_val_a_2, y_val_a_2] \
+            for [X_val_a_1, X_val_a_2],\
+                [y_val_a_1, y_val_a_2] \
                     in zip(
                         tl.iterate.minibatches(
                     X_val_1, y_val_1,
@@ -391,8 +391,8 @@ def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
 
     print('Evaluation')
     test_loss, test_acc, n_batch = 0, 0, 0
-    for [X_test_a_1, X_test_a_2],\
-        [y_test_a_1, y_test_a_2] \
+    for [X_test_a_1, y_test_a_1],\
+        [X_test_a_2, y_test_a_2] \
             in zip(
                 tl.iterate.minibatches(
             X_test_1, y_test_1,
