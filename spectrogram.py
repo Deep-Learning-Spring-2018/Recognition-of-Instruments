@@ -29,9 +29,7 @@ class spectrogram(object):
 
         for audio_index in range(len(self._aiff_datas)):
             spectrogram_image.append(
-                spectrogram_single(self._aiff_datas[audio_index],
-                                   self._temporal_data_point_list[audio_index],
-                                   audio_index))
+                spectrogram_single(self._aiff_datas[audio_index], self._temporal_data_point_list[audio_index]))
 
         return spectrogram_image
 
@@ -66,13 +64,7 @@ class spectrogram(object):
         np.save('spectrogram_image.npz', spectrogram_image_numpy_image)
 
 
-def spectrogram_single(data,
-                       acquisition_points,
-                       audio_index,
-                       sample_rate=44100,
-                       hop=0.25,
-                       resolution=256,
-                       spectrogram_length=256,
+def spectrogram_single(data, acquisition_points, sample_rate=44100, hop=0.25, resolution=256, spectrogram_length=256,
                        channel_num=2):
     """
 
