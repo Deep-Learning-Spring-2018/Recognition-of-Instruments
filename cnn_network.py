@@ -9,7 +9,7 @@
 #########################################################################
 
 import time
-
+import numpy as np
 import tensorflow as tf
 import tensorlayer as tl
 
@@ -26,10 +26,16 @@ def load_datasets(image_type_1: str, image_type_2: str):
     if image_type_1 == 'mpr':
         X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1 = \
             data_prepared.load_mpr_dataset()
+        y_train_1 = np.argmax(y_train_1, axis=1)
+        y_val_1 = np.argmax(y_val_1, axis=1)
+        y_test_1 = np.argmax(y_test_1, axis=1)
         channel_1 = 96
     elif image_type_1 == 'spectrogram':
         X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1 = \
             data_prepared.load_spectrogram_dataset()
+        y_train_1 = np.argmax(y_train_1, axis=1)
+        y_val_1 = np.argmax(y_val_1, axis=1)
+        y_test_1 = np.argmax(y_test_1, axis=1)
         channel_1 = 16
     else:
         print("Not a valid image type")
@@ -38,10 +44,16 @@ def load_datasets(image_type_1: str, image_type_2: str):
     if image_type_2 == 'mpr':
         X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = \
             data_prepared.load_mpr_dataset()
+        y_train_2 = np.argmax(y_train_2, axis=1)
+        y_val_2 = np.argmax(y_val_2, axis=1)
+        y_test_2 = np.argmax(y_test_2, axis=1)
         channel_2 = 96
     elif image_type_2 == 'spectrogram':
         X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = \
             data_prepared.load_spectrogram_dataset()
+        y_train_2 = np.argmax(y_train_2, axis=1)
+        y_val_2 = np.argmax(y_val_2, axis=1)
+        y_test_2 = np.argmax(y_test_2, axis=1)
         channel_2 = 16
     else:
         print("Not a valid image type")
@@ -113,7 +125,7 @@ def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
     # These two functions are at the top of the cnn_network.py
 
     # Btw, Please specify the instrument types when handle with the data
-    output_types = 13
+    output_types = 12
 
     # **********************************************************
     # The following part is about the MCNN network
@@ -365,8 +377,8 @@ def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
             # Now Start validation data process
 
             val_loss, val_acc, n_batch = 0, 0, 0
-            for [X_val_a_1, X_val_a_2],\
-                [y_val_a_1, y_val_a_2] \
+            for [X_val_a_1, y_val_a_1],\
+                [X_val_a_2, y_val_a_2] \
                     in zip(
                         tl.iterate.minibatches(
                     X_val_1, y_val_1,
