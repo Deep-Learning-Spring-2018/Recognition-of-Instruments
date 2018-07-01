@@ -9,3 +9,4 @@ __pycache__
 _trial_temp
 .ipynb_checkpoints
 .git*
+nips*

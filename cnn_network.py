@@ -12,6 +12,7 @@ import time
 import numpy as np
 import tensorflow as tf
 import tensorlayer as tl
+import matplotlib.pyplot as plt
 
 import data_prepared
 
@@ -70,8 +71,12 @@ def MCNN_mpr_mpr():
 
     """
     dataset_1, dataset_2, channel_1, channel_2 = load_datasets('mpr', 'mpr')
-    main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
-                                        channel_2)
+    main_test_cnn_layer_mpr_spectrogram(
+        dataset_1,
+        dataset_2,
+        channel_1,
+        channel_2,
+        prefix_name='mpr_mpr')
 
 
 def MCNN_spectrogram_spectrogram():
@@ -81,8 +86,12 @@ def MCNN_spectrogram_spectrogram():
     """
     dataset_1, dataset_2, channel_1, channel_2 = load_datasets(
         'spectrogram', 'spectrogram')
-    main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
-                                        channel_2)
+    main_test_cnn_layer_mpr_spectrogram(
+        dataset_1,
+        dataset_2,
+        channel_1,
+        channel_2,
+        prefix_name='spectrogram_spectrogram')
 
 
 def MCNN_mpr_spectrogram():
@@ -92,12 +101,16 @@ def MCNN_mpr_spectrogram():
     """
     dataset_1, dataset_2, channel_1, channel_2 = load_datasets(
         'mpr', 'spectrogram')
-    main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
-                                        channel_2)
+    main_test_cnn_layer_mpr_spectrogram(
+        dataset_1,
+        dataset_2,
+        channel_1,
+        channel_2,
+        prefix_name='mpr_spectrogram')
 
 
 def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
-                                        channel_2):
+                                        channel_2, prefix_name):
     # **********************************************************
     # TODO
     # This Place is to Prepared data
@@ -422,6 +435,33 @@ def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
     print("   test loss: %f" % (test_loss / n_batch))
     print("   test acc: %f" % (test_acc / n_batch))
 
+    # Save model
+    saver = tf.train.Saver()
+    save_path = saver.save(sess, "model_" + prefix_name + ".ckpt")
+
+    for layers in len(net.all_params):
+        net.all_params
+        tl.visualize.CNN2d(
+            net.all_params[layers].eval(),
+            second=10,
+            saveable=True,
+            name='cnn_' + prefix_name + str(layers) + '.png',
+            fig_idx=2012)
+
+
+def load_mpr_spectrogram(path):
+    """TODO: Docstring for load_.
+
+    :arg1: TODO
+    :returns: TODO
+
+    """
+    sess = tf.InteractiveSession()
+    saver = tf.train.Saver()
+    saver.restore(sess, "path")
+
 
 if __name__ == "__main__":
+    MCNN_mpr_mpr()
+    MCNN_spectrogram_spectrogram()
     MCNN_mpr_spectrogram()
