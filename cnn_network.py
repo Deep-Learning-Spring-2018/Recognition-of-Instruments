@@ -19,9 +19,6 @@ tf.logging.set_verbosity(tf.logging.DEBUG)
 tl.logging.set_verbosity(tl.logging.DEBUG)
 
 
-
-
-
 def load_datasets(image_type_1: str, image_type_2: str):
     """load the whole dataset to process multicolumn CNN
     :returns: TODO
@@ -37,6 +34,7 @@ def load_datasets(image_type_1: str, image_type_2: str):
         channel_1 = 16
     else:
         print("Not a valid image type")
+        return
 
     if image_type_2 == 'mpr':
         X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = \
@@ -48,10 +46,11 @@ def load_datasets(image_type_1: str, image_type_2: str):
         channel_2 = 16
     else:
         print("Not a valid image type")
+        return
 
     return X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1, \
-        X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2, \
-        channel_1, channel_2
+           X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2, \
+           channel_1, channel_2
 
 
 def MCNN_mpr_mpr():
@@ -82,7 +81,6 @@ def MCNN_mpr_spectrogram():
 def main_test_cnn_layer_mpr_spectrogram(
         X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1, X_train_2,
         y_train_2, X_val_2, y_val_2, X_test_2, y_test_2, channel_1, channel_2):
-
     # **********************************************************
     # TODO
     # This Place is to Prepared data
@@ -298,13 +296,13 @@ def main_test_cnn_layer_mpr_spectrogram(
         # In fact y_train_a_1 is y_
         for X_train_a_1, y_train_a_1, \
             X_train_a_2, y_train_a_2 \
-            in zip(
-                tl.iterate.minibatches(
+                in zip(
+            tl.iterate.minibatches(
                 X_train_1, y_train_1,
-                    batch_size, shuffle=True),
-                tl.iterate.minibatches(
+                batch_size, shuffle=True),
+            tl.iterate.minibatches(
                 X_train_2, y_train_2,
-                    batch_size, shuffle=True)):
+                batch_size, shuffle=True)):
             feed_dict = {x_1: X_train_a_1, x_2: X_train_a_2, y_: y_train_a_1}
 
             # enable noise layers when not output
@@ -322,14 +320,13 @@ def main_test_cnn_layer_mpr_spectrogram(
 
             for X_train_a_1, y_train_a_1, \
                 X_train_a_2, y_train_a_2 \
-                in zip(
-                    tl.iterate.minibatches(
+                    in zip(
+                tl.iterate.minibatches(
                     X_train_1, y_train_1,
-                        batch_size, shuffle=True),
-                    tl.iterate.minibatches(
+                    batch_size, shuffle=True),
+                tl.iterate.minibatches(
                     X_train_2, y_train_2,
-                        batch_size, shuffle=True)):
-
+                    batch_size, shuffle=True)):
                 # disable noise layers
                 dp_dict = tl.utils.dict_to_one(net.all_drop)
 
@@ -351,14 +348,13 @@ def main_test_cnn_layer_mpr_spectrogram(
             val_loss, val_acc, n_batch = 0, 0, 0
             for X_val_a_1, y_val_a_1, \
                 X_val_a_2, y_val_a_2 \
-                in zip(
-                    tl.iterate.minibatches(
+                    in zip(
+                tl.iterate.minibatches(
                     X_val_1, y_val_1,
-                        batch_size, shuffle=True),
-                    tl.iterate.minibatches(
+                    batch_size, shuffle=True),
+                tl.iterate.minibatches(
                     X_val_2, y_val_2,
-                        batch_size, shuffle=True)):
-
+                    batch_size, shuffle=True)):
                 dp_dict = tl.utils.dict_to_one(
                     net.all_drop)  # disable noise layers
                 feed_dict = {x_1: X_val_a_1, x_2: X_val_a_2, y_: y_val_a_1}
@@ -378,13 +374,13 @@ def main_test_cnn_layer_mpr_spectrogram(
     test_loss, test_acc, n_batch = 0, 0, 0
     for X_test_a_1, y_test_a_1, \
         X_test_a_2, y_test_a_2 \
-        in zip(
-            tl.iterate.minibatches(
+            in zip(
+        tl.iterate.minibatches(
             X_test_1, y_test_1,
-                batch_size, shuffle=True),
-            tl.iterate.minibatches(
+            batch_size, shuffle=True),
+        tl.iterate.minibatches(
             X_test_2, y_test_2,
-                batch_size, shuffle=True)):
+            batch_size, shuffle=True)):
         dp_dict = tl.utils.dict_to_one(net.all_drop)  # disable noise layers
         feed_dict = {x_1: X_test_a_1, x_2: X_test_a_2, y_: y_test_a_1}
         feed_dict.update(dp_dict)

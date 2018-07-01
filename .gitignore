@@ -8,3 +8,4 @@ __pycache__
 .gitignore.swp
 _trial_temp
 .ipynb_checkpoints
+.git*
