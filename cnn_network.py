@@ -72,11 +72,7 @@ def MCNN_mpr_mpr():
     """
     dataset_1, dataset_2, channel_1, channel_2 = load_datasets('mpr', 'mpr')
     main_test_cnn_layer_mpr_spectrogram(
-        dataset_1,
-        dataset_2,
-        channel_1,
-        channel_2,
-        prefix_name='mpr_mpr')
+        dataset_1, dataset_2, channel_1, channel_2, prefix_name='mpr_mpr')
 
 
 def MCNN_spectrogram_spectrogram():
@@ -143,10 +139,6 @@ def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
     # **********************************************************
     # The following part is about the MCNN network
 
-    # This is official mnist data
-    # X_train, y_train, X_val, y_val, X_test, y_test = tl.files.load_mnist_dataset(
-    #     shape=(-1, 28, 28, 1))
-
     # Unpack data list
     X_train_1, y_train_1, X_val_1, y_val_1, X_test_1, y_test_1 = dataset_1
     X_train_2, y_train_2, X_val_2, y_val_2, X_test_2, y_test_2 = dataset_2
@@ -178,31 +170,6 @@ def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
 
     net_1 = tl.layers.InputLayer(x_1, name='input_1')
     net_2 = tl.layers.InputLayer(x_2, name='input_2')
-    # Professional conv API for tensorflow expert
-    # net = tl.layers.Conv2dLayer(net,
-    #                     act = tf.nn.relu,
-    #                     shape = [5, 5, 1, 32],  # 32 features for each 5x5 patch
-    #                     strides=[1, 1, 1, 1],
-    #                     padding='SAME',
-    #                     name ='cnn1')     # output: (?, 28, 28, 32)
-    # net = tl.layers.PoolLayer(net,
-    #                     ksize=[1, 2, 2, 1],
-    #                     strides=[1, 2, 2, 1],
-    #                     padding='SAME',
-    #                     pool = tf.nn.max_pool,
-    #                     name ='pool1',)   # output: (?, 14, 14, 32)
-    # net = tl.layers.Conv2dLayer(net,
-    #                     act = tf.nn.relu,
-    #                     shape = [5, 5, 32, 64], # 64 features for each 5x5 patch
-    #                     strides=[1, 1, 1, 1],
-    #                     padding='SAME',
-    #                     name ='cnn2')     # output: (?, 14, 14, 64)
-    # net = tl.layers.PoolLayer(net,
-    #                     ksize=[1, 2, 2, 1],
-    #                     strides=[1, 2, 2, 1],
-    #                     padding='SAME',
-    #                     pool = tf.nn.max_pool,
-    #                     name ='pool2',)   # output: (?, 7, 7, 64)
     # Simplified conv API (the same with the above layers)
 
     # For MPR image network
@@ -277,63 +244,6 @@ def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
     print('   batch_size: %d' % batch_size)
 
     # Training parameter for one input
-
-    # for epoch in range(n_epoch):
-    #     start_time = time.time()
-    #     for X_train_a, y_train_a in tl.iterate.minibatches(
-    #             X_train, y_train, batch_size, shuffle=True):
-    #         feed_dict = {x: X_train_a, y_: y_train_a}
-    #         feed_dict.update(net.all_drop)  # enable noise layers
-    #         sess.run(train_op, feed_dict=feed_dict)
-
-    #     # Show train information every print_freq
-    #     if epoch + 1 == 1 or (epoch + 1) % print_freq == 0:
-    #         print("Epoch %d of %d took %fs" % (epoch + 1, n_epoch,
-    #                                            time.time() - start_time))
-    #         train_loss, train_acc, n_batch = 0, 0, 0
-    #         for X_train_a, y_train_a in tl.iterate.minibatches(
-    #                 X_train, y_train, batch_size, shuffle=True):
-    #             dp_dict = tl.utils.dict_to_one(
-    #                 net.all_drop)  # disable noise layers
-    #             feed_dict = {x: X_train_a, y_: y_train_a}
-    #             feed_dict.update(dp_dict)
-    #             err, ac = sess.run([cost, acc], feed_dict=feed_dict)
-    #             train_loss += err
-    #             train_acc += ac
-    #             n_batch += 1
-    #         print("   train loss: %f" % (train_loss / n_batch))
-    #         print("   train acc: %f" % (train_acc / n_batch))
-    #         val_loss, val_acc, n_batch = 0, 0, 0
-    #         for X_val_a, y_val_a in tl.iterate.minibatches(
-    #                 X_val, y_val, batch_size, shuffle=True):
-    #             dp_dict = tl.utils.dict_to_one(
-    #                 net.all_drop)  # disable noise layers
-    #             feed_dict = {x: X_val_a, y_: y_val_a}
-    #             feed_dict.update(dp_dict)
-    #             err, ac = sess.run([cost, acc], feed_dict=feed_dict)
-    #             val_loss += err
-    #             val_acc += ac
-    #             n_batch += 1
-    #         print("   val loss: %f" % (val_loss / n_batch))
-    #         print("   val acc: %f" % (val_acc / n_batch))
-    #         # try:
-    #         #     tl.vis.CNN2d(net.all_params[0].eval(), second=10, saveable=True, name='cnn1_' + str(epoch + 1), fig_idx=2012)
-    #         # except:  # pylint: disable=bare-except
-    #         #     print("You should change vis.CNN(), if you want to save the feature images for different dataset")
-
-    # print('Evaluation')
-    # test_loss, test_acc, n_batch = 0, 0, 0
-    # for X_test_a, y_test_a in tl.iterate.minibatches(
-    #         X_test, y_test, batch_size, shuffle=True):
-    #     dp_dict = tl.utils.dict_to_one(net.all_drop)  # disable noise layers
-    #     feed_dict = {x: X_test_a, y_: y_test_a}
-    #     feed_dict.update(dp_dict)
-    #     err, ac = sess.run([cost, acc], feed_dict=feed_dict)
-    #     test_loss += err
-    #     test_acc += ac
-    #     n_batch += 1
-    # print("   test loss: %f" % (test_loss / n_batch))
-    # print("   test acc: %f" % (test_acc / n_batch))
 
     for epoch in range(n_epoch):
         start_time = time.time()
@@ -436,17 +346,16 @@ def main_test_cnn_layer_mpr_spectrogram(dataset_1, dataset_2, channel_1,
     print("   test acc: %f" % (test_acc / n_batch))
 
     # Save model
-    saver = tf.train.Saver()
-    save_path = saver.save(sess, "model_" + prefix_name + ".ckpt")
+    tl.files.save_npz(net.all_params, name='model.npz', sess=sess)
 
-    for layers in len(net.all_params):
-        net.all_params
-        tl.visualize.CNN2d(
-            net.all_params[layers].eval(),
-            second=10,
-            saveable=True,
-            name='cnn_' + prefix_name + str(layers) + '.png',
-            fig_idx=2012)
+    # for layers in len(net.all_params):
+    #     net.all_params
+    #     tl.visualize.CNN2d(
+    #         net.all_params[layers].eval(),
+    #         second=10,
+    #         saveable=True,
+    #         name='cnn_' + prefix_name + str(layers) + '.png',
+    #         fig_idx=2012)
 
 
 def load_mpr_spectrogram(path):
@@ -456,9 +365,78 @@ def load_mpr_spectrogram(path):
     :returns: TODO
 
     """
+
     sess = tf.InteractiveSession()
-    saver = tf.train.Saver()
-    saver.restore(sess, "path")
+
+    # Define the batchsize at the begin, you can give the batchsize in x and y_
+    # rather than 'None', this can allow TensorFlow to apply some optimizations
+    # – especially for convolutional layers.
+    batch_size = 16
+    channel_1 = 96
+    channel_2 = 16
+    output_types = 12
+
+    x_1 = tf.placeholder(
+        tf.float32, shape=[batch_size, 32, 32,
+                           channel_1])  # [batch_size, height, width, channels]
+
+    x_2 = tf.placeholder(
+        tf.float32, shape=[batch_size, 32, 32,
+                           channel_2])  # [batch_size, height, width, channels]
+    y_ = tf.placeholder(tf.int64, shape=[batch_size])
+
+    net_1 = tl.layers.InputLayer(x_1, name='input_1')
+    net_2 = tl.layers.InputLayer(x_2, name='input_2')
+
+    # For MPR image network
+    net_1 = tl.layers.Conv2d(
+        net_1,
+        32, (5, 5), (1, 1),
+        act=tf.nn.relu,
+        padding='SAME',
+        name='cnn1_1')
+    net_1 = tl.layers.MaxPool2d(
+        net_1, (2, 2), (2, 2), padding='SAME', name='pool1_1')
+    net_1 = tl.layers.Conv2d(
+        net_1,
+        32, (5, 5), (1, 1),
+        act=tf.nn.relu,
+        padding='SAME',
+        name='cnn2_1')
+    net_1 = tl.layers.MaxPool2d(
+        net_1, (2, 2), (2, 2), padding='SAME', name='pool2_1')
+    net_1 = tl.layers.FlattenLayer(net_1, name='flatten_1')
+
+    # For spectrogram image network
+    net_2 = tl.layers.Conv2d(
+        net_2,
+        32, (5, 5), (1, 1),
+        act=tf.nn.relu,
+        padding='SAME',
+        name='cnn1_2')
+    net_2 = tl.layers.MaxPool2d(
+        net_2, (2, 2), (2, 2), padding='SAME', name='pool1_2')
+    net_2 = tl.layers.Conv2d(
+        net_2,
+        32, (5, 5), (1, 1),
+        act=tf.nn.relu,
+        padding='SAME',
+        name='cnn2_2')
+    net_2 = tl.layers.MaxPool2d(
+        net_2, (2, 2), (2, 2), padding='SAME', name='pool2_2')
+    net_2 = tl.layers.FlattenLayer(net_2, name='flatten_2')
+
+    # end of conv
+
+    net = tl.layers.ElementwiseLayer(
+        [net_1, net_2], combine_fn=tf.add, name='concat_layer')
+    net = tl.layers.DropoutLayer(net, keep=0.5, name='drop1')
+    net = tl.layers.DenseLayer(net, 256, act=tf.nn.relu, name='relu1')
+    net = tl.layers.DropoutLayer(net, keep=0.5, name='drop2')
+    net = tl.layers.DenseLayer(
+        net, output_types, act=tf.identity, name='output')
+
+    tl.files.load_and_assign_npz(sess=sess, name='model.npz', network=net)
 
 
 if __name__ == "__main__":
