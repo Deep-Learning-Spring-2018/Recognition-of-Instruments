@@ -32,9 +32,10 @@ Just run `./run.sh` in the root directory, everything is automatically done.
 
 ## Dependency
 
-1. `tensorflow`
-2. `tensorlayer`
-3. `pysoundfile`
-4. `numpy`
-5. `scipy`
-6. `matplotlib`
+1. `python3 >= 3.6.3`
+2. `tensorflow > 1.6.0`
+3. `tensorlayer`
+4. `pysoundfile`
+5. `numpy`
+6. `scipy`
+7. `matplotlib`
